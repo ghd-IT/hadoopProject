@@ -6,11 +6,10 @@ import org.apache.commons.lang.StringUtils;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.management.GarbageCollectorMXBean;
 import java.util.Objects;
 
-public class Currency_typeDimension extends  BaseDimension{
-    private  int id;
+public class Currency_typeDimension extends BaseDimension {
+    private int id;
     private String currency_name;
 
     public Currency_typeDimension() {
@@ -23,13 +22,9 @@ public class Currency_typeDimension extends  BaseDimension{
     public Currency_typeDimension(int id, String currency_name) {
         this(currency_name);
         this.id = id;
+
     }
-    public  static  Currency_typeDimension getInstance(String currency_name){
-        if(StringUtils.isEmpty(currency_name)){
-            currency_name= GlobalConstants.DEFAULT_VALUE;
-        }
-        return  new Currency_typeDimension(currency_name);
-    }
+
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
@@ -39,21 +34,29 @@ public class Currency_typeDimension extends  BaseDimension{
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        this.id =dataInput.readInt();
+        this.id = dataInput.readInt();
         this.currency_name = dataInput.readUTF();
     }
 
     @Override
     public int compareTo(BaseDimension o) {
-        if(this==o){
+        if (this == o) {
             return 0;
         }
         Currency_typeDimension other = (Currency_typeDimension) o;
-        int tmp = this.id -other.id;
-        if(tmp!=0){
+        int tmp = this.id - other.id;
+        if (tmp != 0) {
             return tmp;
         }
         return this.currency_name.compareTo(other.currency_name);
+    }
+
+    public static Currency_typeDimension getInstance(String currency_name) {
+        if (StringUtils.isEmpty(currency_name)) {
+            currency_name = GlobalConstants.DEFAULT_VALUE;
+
+        }
+        return new Currency_typeDimension(currency_name);
     }
 
     public int getId() {
