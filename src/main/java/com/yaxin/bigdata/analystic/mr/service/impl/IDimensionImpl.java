@@ -49,6 +49,12 @@ public class IDimensionImpl implements IDimension {
                 sqls = buildEventSqls(dimension);
             }else  if(dimension instanceof  InboundDimension){
                 sqls = buildInboundSqls(dimension);
+            }else  if(dimension instanceof  Currency_typeDimension){
+                sqls = buildCurrency_typeSqls(dimension);
+            }else if(dimension instanceof Event_copyDimension){
+                sqls = buildEvent_copySqls(dimension);
+            }else  if(dimension instanceof  Payment_typeDimension){
+                sqls = buildPayment_typeSqls(dimension);
             }
 
             //获取jdbc的连接
@@ -114,7 +120,21 @@ public class IDimensionImpl implements IDimension {
         String insert = "insert into `dimension_inbound`(`parent_id` , `name` ,`url` , `type`) values(?,?,?,?)";
         return new String[]{insert,query};
     }
-
+    private String[] buildCurrency_typeSqls(BaseDimension dimension){
+        String insertSql = "insert into `dimension_currency_type`(currency_name) values(?)";
+        String selectSql = "select id from `dimension_currency_type` where currency_name = ?";
+        return new String[]{insertSql,selectSql};
+    }
+    private String[] buildEvent_copySqls(BaseDimension dimension){
+        String query = "select id from `dimension_event_copy` where `category` = ? and `action` = ? ";
+        String insert = "insert into `dimension_event_copy`(`category` , `action` ) values(?,?)";
+        return new String[]{insert,query};
+    }
+    private String[] buildPayment_typeSqls(BaseDimension dimension){
+        String insertSql = "insert into `dimension_payment_type`(payment_type) values(?)";
+        String selectSql = "select id from `dimension_payment_type` where payment_type = ?";
+        return new String[]{insertSql,selectSql};
+    }
     /**
      * 构建维度key
      * @param dimension
@@ -165,6 +185,20 @@ public class IDimensionImpl implements IDimension {
             sb.append(inbound.getName());
             sb.append(inbound.getUrl());
             sb.append(inbound.getType());
+        }else if(dimension instanceof Currency_typeDimension){
+            Currency_typeDimension currency_type = (Currency_typeDimension) dimension;
+            sb.append("currency_type_");
+            sb.append(currency_type.getCurrency_name());
+        }else if(dimension instanceof Event_copyDimension){
+            Event_copyDimension event_copy = (Event_copyDimension) dimension;
+            sb.append("event_copy_");
+            sb.append(event_copy.getCategory());
+            sb.append(event_copy.getAction());
+
+        }else if(dimension instanceof Payment_typeDimension){
+            Payment_typeDimension payment_type = (Payment_typeDimension) dimension;
+            sb.append("payment_type_");
+            sb.append(payment_type.getPayment_type());
         }
         return sb != null ? sb.toString() : null;
 
@@ -247,7 +281,16 @@ public class IDimensionImpl implements IDimension {
                 ps.setString(++i,inbound.getName());
                 ps.setString(++i,inbound.getUrl());
                 ps.setString(++i,inbound.getType());
-
+            }else if(dimension instanceof  Currency_typeDimension) {
+                Currency_typeDimension currency_type = (Currency_typeDimension) dimension;
+                ps.setString(++i,currency_type.getCurrency_name());
+            }else if(dimension instanceof Event_copyDimension){
+                Event_copyDimension event_copy = (Event_copyDimension) dimension;
+                ps.setString(++i,event_copy.getCategory());
+                ps.setString(++i,event_copy.getAction());
+            }else if(dimension instanceof Payment_typeDimension) {
+                Payment_typeDimension payment_type = (Payment_typeDimension) dimension;
+                ps.setString(++i,payment_type.getPayment_type());
             }
         } catch (SQLException e) {
             e.printStackTrace();
